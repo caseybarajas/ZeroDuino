@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Robot Friend Control</title>
+    <title>Control LCD</title>
 </head>
 <body>
-    <h1>Control the Robot Friend's LED</h1>
-    <form action="/control_led" method="post">
-        <input type="submit" name="action" value="on">
-        <input type="submit" name="action" value="off">
+    <h1>Send Text to LCD</h1>
+    <form action="/send_text" method="post">
+        <input type="text" name="text" placeholder="Enter text" required>
+        <button type="submit">Send</button>
     </form>
 </body>
 </html>
