@@ -1,20 +1,18 @@
-from flask import Flask, render_template, request
+from flask import Flask, request
 import serial
+import time
 
 app = Flask(__name__)
+arduino = serial.Serial('/dev/ttyACM0', 9600) 
 
-ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
-ser.flush()
+def send_to_arduino(speed):
+    arduino.write(f"{speed}\n".encode())
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/send_text', methods=['POST'])
-def send_text():
-    text = request.form['text']
-    ser.write(text.encode())  # Send the text to the Arduino
-    return ('', 204)
+@app.route('/motor', methods=['POST'])
+def motor():
+    speed = request.form.get('speed', type=int)
+    send_to_arduino(speed)
+    return f"Motor set to {speed}"
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(host='0.0.0.0', port=8080)
