@@ -1,12 +1,16 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 import serial
 import time
 
 app = Flask(__name__)
-arduino = serial.Serial('/dev/ttyACM0', 9600) 
+arduino = serial.Serial('/dev/ttyACM0', 9600)
 
 def send_to_arduino(speed):
     arduino.write(f"{speed}\n".encode())
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 @app.route('/motor', methods=['POST'])
 def motor():
