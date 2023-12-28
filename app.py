@@ -1,18 +1,28 @@
 from flask import Flask, render_template, jsonify
 import serial
 import threading
+import time
 
 app = Flask(__name__)
-arduino = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
-arduino.flush()
 
-arduino_data = {"counter": 0}  # Renamed variable to avoid conflict
+try:
+    arduino = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+    arduino.flush()
+except serial.SerialException as e:
+    print("Error opening serial port: ", e)
+    exit()
+
+arduino_data = {"counter": 0}
 
 def read_from_arduino():
     while True:
-        if arduino.in_waiting > 0:
-            line = arduino.readline().decode('utf-8').rstrip()
-            arduino_data["counter"] = line  # Use the renamed variable
+        try:
+            if arduino.in_waiting > 0:
+                line = arduino.readline().decode('utf-8').rstrip()
+                arduino_data["counter"] = line
+        except serial.SerialException as e:
+            print("Error reading from serial port: ", e)
+            time.sleep(2)  # Wait for a bit before trying again
 
 thread = threading.Thread(target=read_from_arduino)
 thread.start()
