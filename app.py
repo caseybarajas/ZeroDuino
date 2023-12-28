@@ -19,10 +19,16 @@ def read_from_arduino():
         try:
             if arduino.in_waiting > 0:
                 line = arduino.readline().decode('utf-8').rstrip()
-                arduino_data["counter"] = line
+                try:
+                    # Convert the line to an integer and update the data
+                    arduino_data["counter"] = int(line)
+                except ValueError:
+                    # If the conversion fails, it means the data is not a valid integer
+                    print("Invalid data received:", line)
         except serial.SerialException as e:
             print("Error reading from serial port: ", e)
             time.sleep(2)  # Wait for a bit before trying again
+
 
 thread = threading.Thread(target=read_from_arduino)
 thread.start()
