@@ -2,51 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Motor Control Interface</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        .slider {
-            width: 300px;
-            margin: 10px;
-        }
-    </style>
+    <title>Arduino Data Display</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            function fetchData() {
+                $.ajax({
+                    url: '/data',
+                    type: 'GET',
+                    success: function(response) {
+                        $('#counter').text(response.counter);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            }
+            setInterval(fetchData, 1000); // Update every second
+        });
+    </script>
 </head>
 <body>
-    <h2>Motor Control</h2>
-    <form id="motorControlForm">
-        <input type="range" min="0" max="180" value="90" class="slider" id="motorSpeed">
-        <p>Speed: <span id="speedValue">90</span></p>
-        <button type="submit">Set Motor Speed</button>
-    </form>
-
-    <script>
-        document.getElementById('motorSpeed').oninput = function() {
-            document.getElementById('speedValue').textContent = this.value;
-        };
-
-        document.getElementById('motorControlForm').onsubmit = function(e) {
-            e.preventDefault();
-            var speed = document.getElementById('motorSpeed').value;
-            
-            fetch('/motor', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'speed=' + speed
-            })
-            .then(response => response.text())
-            .then(data => {
-                alert(data);
-            })
-            .catch(error => {
-                alert('Error:' + error);
-            });
-        };
-    </script>
+    <h1>Arduino Data</h1>
+    <p>Counter: <span id="counter">{{ data.counter }}</span></p>
 </body>
 </html>

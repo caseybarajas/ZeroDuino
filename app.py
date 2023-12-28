@@ -1,24 +1,29 @@
-from flask import Flask, request, render_template
+from flask import Flask, render_template, jsonify
 import serial
-import time
+import threading
 
 app = Flask(__name__)
-arduino = serial.Serial('/dev/ttyACM0', 9600)
+arduino = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+arduino.flush()
 
-def send_to_arduino(speed):
-    print(f"Sending to Arduino: {speed}")
-    arduino.write(f"{speed}\n".encode())
+data = {"counter": 0}
+
+def read_from_arduino():
+    while True:
+        if arduino.in_waiting > 0:
+            line = arduino.readline().decode('utf-8').rstrip()
+            data["counter"] = line
+
+thread = threading.Thread(target=read_from_arduino)
+thread.start()
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', data=data)
 
-@app.route('/motor', methods=['POST'])
-def motor():
-    speed = request.form['speed']
-    print(f"Received speed: {speed}")
-    send_to_arduino(speed)
-    return f"Motor set to {speed}"
+@app.route('/data')
+def data():
+    return jsonify(data)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(debug=True, host='0.0.0.0')
