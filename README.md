@@ -36,7 +36,7 @@ To use ZeroDuino, you will need the following:
 1. Clone the ZeroDuino repository to your Raspberry Pi:
 
     ```shell
-    git clone https://github.com/Laughable33/ZeroDuino.git
+    git clone https://github.com/caseybarajas33/ZeroDuino.git
     ```
 
 2. Install the required Python packages:
